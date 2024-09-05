@@ -1,7 +1,29 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Resume Extractor
+
+Resume Extractor is an AI-powered tool that helps users extract key information from resume PDFs. It leverages OpenAI's Structured Output capabilities to automatically identify and extract essential details with high accuracy.
+
+## Features
+
+- AI-powered extraction of key information from resume PDFs
+- Utilizes OpenAI's Structured Output for precise data parsing
+- Identifies and extracts:
+  - Name
+  - Self-assessment
+  - Company experience
+  - Educational background
+- Converts unstructured resume data into structured, easily analyzable format
+- Modern, responsive UI designed with v0.dev
+
+## Key Technology
+
+- **AI-Driven Extraction**: Employs advanced AI models to understand and parse complex resume formats
+- **OpenAI Structured Output**: Ensures consistent and accurate extraction of information into predefined structures
+- **PDF Processing**: Handles various PDF formats and layouts
+- **v0.dev**: Used for designing the entire UI, generating shadcn-compatible components
+- **shadcn UI**: Utilized for rapid development of a sleek, modern interface
+- **Cursor AI**: Employed to complete additional features and enhance functionality
 
 ## Getting Started
-
 First, run the development server:
 
 ```bash
@@ -16,21 +38,43 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- Node.js
+- Next.js
+- OpenAI API access
 
-## Learn More
+### Installation
 
-To learn more about Next.js, take a look at the following resources:
+1. Clone the repository:
+   ```
+   git clone https://github.com/jiangyan/resume-extractor.git
+   ```
+2. Navigate to the project directory:
+   ```
+   cd resume-extractor
+   ```
+3. Install dependencies:
+   ```
+   npm install
+   ```
+4. Set up your OpenAI API credentials (add instructions on how to do this securely)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Usage
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+It's pretty straight forward, UI is in Chinese though
 
-## Deploy on Vercel
+## Contributing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## License
+
+It's 99% AI generated codes, I only input English, then tab, tab, tab, ta-da, use whatever you want
+
+## Acknowledgments
+
+- OpenAI for providing the AI models and Structured Output capabilities
+- [v0.dev](https://v0.dev/) for UI design and component generation
+- [shadcn UI](https://ui.shadcn.com/) for the component library
+- Cursor AI for assisting with feature completion
