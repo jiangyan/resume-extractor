@@ -57,23 +57,29 @@ export default function ResumeAnalyzer() {
   }
 
   const handleAnalyze = async () => {
-    setIsLoading(true)
-    setResults([]) // Clear existing results
+    setIsLoading(true);
+    setResults([]); // Clear existing results
     try {
       for (let i = 0; i < files.length; i++) {
-        setCurrentFile(files[i].name)
-        const fileContent = await readFileAsText(files[i])
+        setCurrentFile(files[i].name);
+        const fileContent = await readFileAsText(files[i]);
         
-        const candidates = await analyzeResumes([fileContent], selectedModel)
+        const response = await fetch('/api/analyze-resumes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fileContents: [fileContent], model: selectedModel }),
+        });
+        const candidates = await response.json();
+        
         if (candidates) {
-          setResults(prev => [...prev, ...candidates])
+          setResults(prev => [...prev, ...candidates]);
         }
       }
     } catch (error) {
-      console.error("Error analyzing resumes:", error)
+      console.error("Error analyzing resumes:", error);
     } finally {
-      setIsLoading(false)
-      setCurrentFile(null)
+      setIsLoading(false);
+      setCurrentFile(null);
     }
   }
 

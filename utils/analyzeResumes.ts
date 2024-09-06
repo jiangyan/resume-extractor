@@ -34,7 +34,7 @@ export async function analyzeResumes(fileContents: string[], model: string): Pro
 }
 
 async function analyzeResumesWithOpenAI(fileContents: string[], model: string): Promise<CandidateInfoType[]> {
-  const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     console.error("OpenAI API key is not set");
     return [];
@@ -78,7 +78,7 @@ async function analyzeResumesWithOpenAI(fileContents: string[], model: string): 
 }
 
 async function analyzeResumesWithGemini(fileContents: string[], modelName: string): Promise<CandidateInfoType[]> {
-  const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     console.error("Google API key is not set");
     return [];
