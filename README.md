@@ -1,11 +1,15 @@
 # Resume Extractor
 
-Resume Extractor is an AI-powered tool that helps users extract key information from resume PDFs. It leverages OpenAI's Structured Output capabilities to automatically identify and extract essential details with high accuracy.
+Resume Extractor is an AI-powered tool that helps users extract key information from resume PDFs. It leverages multiple AI models, including OpenAI's GPT and Google's Gemini, to automatically identify and extract essential details with high accuracy.
 
 ## Features
 
 - AI-powered extraction of key information from resume PDFs
-- Utilizes OpenAI's Structured Output for precise data parsing
+- Support for multiple AI models:
+  - OpenAI: gpt-4o-mini-2024-07-18
+  - OpenAI: gpt-4o-2024-08-06
+  - Google: gemini-1.5-flash
+  - Google: gemini-1.5-pro
 - Identifies and extracts:
   - Name
   - Self-assessment
@@ -16,8 +20,9 @@ Resume Extractor is an AI-powered tool that helps users extract key information 
 
 ## Key Technology
 
-- **AI-Driven Extraction**: Employs advanced AI models to understand and parse complex resume formats
-- **OpenAI Structured Output**: Ensures consistent and accurate extraction of information into predefined structures
+- **Multi-Model AI-Driven Extraction**: Employs advanced AI models from OpenAI and Google to understand and parse complex resume formats
+- **OpenAI GPT Models**: Utilizes the latest GPT models for precise information extraction
+- **Google Gemini Models**: Leverages Gemini's capabilities for structured output and efficient processing
 - **PDF Processing**: Handles various PDF formats and layouts
 - **v0.dev**: Used for designing the entire UI, generating shadcn-compatible components
 - **shadcn UI**: Utilized for rapid development of a sleek, modern interface
