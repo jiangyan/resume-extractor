@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { analyzeResumes } from "@/utils/analyzeResumes"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface CandidateInfo {
   name: string;
@@ -18,6 +19,7 @@ export function ResumeAnalyzer() {
   const [results, setResults] = useState<CandidateInfo[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [currentFile, setCurrentFile] = useState<string | null>(null)
+  const [selectedModel, setSelectedModel] = useState<string>("openai:gpt-4o-mini-2024-07-18")
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -48,6 +50,10 @@ export function ResumeAnalyzer() {
     }
   }
 
+  const handleModelChange = (value: string) => {
+    setSelectedModel(value)
+  }
+
   const handleAnalyze = async () => {
     setIsLoading(true)
     setResults([]) // Clear existing results
@@ -56,7 +62,7 @@ export function ResumeAnalyzer() {
         setCurrentFile(files[i].name)
         const fileContent = await readFileAsText(files[i])
         
-        const candidates = await analyzeResumes([fileContent])
+        const candidates = await analyzeResumes([fileContent], selectedModel)
         if (candidates) {
           setResults(prev => [...prev, ...candidates])
         }
@@ -72,6 +78,19 @@ export function ResumeAnalyzer() {
   return (
     <div className="container mx-auto p-4 space-y-6">
       <h1 className="text-2xl font-bold">简历关键信息自动提取</h1>
+      
+      <Select onValueChange={handleModelChange} defaultValue={selectedModel}>
+        <SelectTrigger className="w-[250px]">
+          <SelectValue placeholder="选择模型" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="openai:gpt-4o-mini-2024-07-18">OpenAI: gpt-4o-mini-2024-07-18</SelectItem>
+          <SelectItem value="openai:gpt-4o-2024-08-06">OpenAI: gpt-4o-2024-08-06</SelectItem>
+          <SelectItem value="google:gemini-1.5-flash-exp-0827">Google: gemini-1.5-flash-exp-0827</SelectItem>
+          <SelectItem value="google:gemini-1.5-pro-exp-0827">Google: gemini-1.5-pro-exp-0827</SelectItem>
+        </SelectContent>
+      </Select>
+
       <div className="space-y-2">
         <Input 
           type="file" 
@@ -100,7 +119,7 @@ export function ResumeAnalyzer() {
             <TableRow>
               <TableHead className="w-[50px]">序号</TableHead>
               <TableHead className="w-[100px]">姓名</TableHead>
-              <TableHead className="w-[200px]">自我评价</TableHead>
+              <TableHead className="w-[400px]">自我评价</TableHead>
               <TableHead>公司经历</TableHead>
               <TableHead>毕业学校</TableHead>
             </TableRow>
