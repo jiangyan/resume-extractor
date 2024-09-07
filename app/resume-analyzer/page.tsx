@@ -4,15 +4,15 @@ import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { analyzeResumes } from "@/utils/analyzeResumes"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Header } from "@/components/ui/header"
 import { Footer } from "@/components/ui/footer"
+import { Loader2 } from "lucide-react" // Add this import
 
 interface CandidateInfo {
   name: string;
   selfAssessment: string;
-  companyExperiences: { name: string; duration: string; }[];
+  companies: { name: string; duration: string; }[];
   graduateSchools: { name: string; duration: string; }[];
 }
 
@@ -22,6 +22,7 @@ export default function ResumeAnalyzer() {
   const [isLoading, setIsLoading] = useState(false)
   const [currentFile, setCurrentFile] = useState<string | null>(null)
   const [selectedModel, setSelectedModel] = useState<string>("openai:gpt-4o-mini-2024-07-18")
+  const [currentFileIndex, setCurrentFileIndex] = useState<number>(0)
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -58,10 +59,12 @@ export default function ResumeAnalyzer() {
 
   const handleAnalyze = async () => {
     setIsLoading(true);
-    setResults([]); // Clear existing results
+    setResults([]);
+    setCurrentFileIndex(0);
     try {
       for (let i = 0; i < files.length; i++) {
         setCurrentFile(files[i].name);
+        setCurrentFileIndex(i + 1);
         const fileContent = await readFileAsText(files[i]);
         
         const response = await fetch('/api/analyze-resumes', {
@@ -80,6 +83,7 @@ export default function ResumeAnalyzer() {
     } finally {
       setIsLoading(false);
       setCurrentFile(null);
+      setCurrentFileIndex(0);
     }
   }
 
@@ -99,6 +103,8 @@ export default function ResumeAnalyzer() {
               <SelectItem value="openai:gpt-4o-2024-08-06">OpenAI: gpt-4o-2024-08-06</SelectItem>
               <SelectItem value="google:gemini-1.5-flash-exp-0827">Google: gemini-1.5-flash-exp-0827</SelectItem>
               <SelectItem value="google:gemini-1.5-pro-exp-0827">Google: gemini-1.5-pro-exp-0827</SelectItem>
+              <SelectItem value="claude:claude-3-haiku-20240307">Claude: claude-3-haiku-20240307</SelectItem>
+              <SelectItem value="claude:claude-3-5-sonnet-20240620">Claude: claude-3-5-sonnet-20240620</SelectItem>              
             </SelectContent>
           </Select>
 
@@ -117,10 +123,17 @@ export default function ResumeAnalyzer() {
               onClick={handleAnalyze} 
               disabled={files.length === 0 || isLoading}
             >
-              {isLoading ? '处理中...' : '提取关键信息'}
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  处理中...
+                </>
+              ) : '提取关键信息'}
             </Button>
             {currentFile && (
-              <p className="text-sm text-gray-600">{currentFile} 正在处理中...</p>
+              <p className="text-sm text-gray-600">
+                第 {currentFileIndex} 份简历 (共 {files.length} 份简历)，{currentFile} 正在处理中...
+              </p>
             )}
           </div>
           
@@ -146,7 +159,7 @@ export default function ResumeAnalyzer() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      {result.companyExperiences.map((exp, i) => (
+                      {result.companies.map((exp, i) => (
                         <div key={i}>{exp.name} ({exp.duration})</div>
                       ))}
                     </TableCell>

@@ -3,11 +3,12 @@ import { zodResponseFormat } from "openai/helpers/zod";
 import { z } from "zod";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { SchemaType } from '@google/generative-ai';
+import { Anthropic } from '@anthropic-ai/sdk';
 
 const CandidateInfo = z.object({
   name: z.string(),
   selfAssessment: z.string(),
-  companyExperiences: z.array(z.object({
+  companies: z.array(z.object({
     name: z.string(),
     duration: z.string()
   })),
@@ -27,6 +28,8 @@ export async function analyzeResumes(fileContents: string[], model: string): Pro
       return analyzeResumesWithOpenAI(fileContents, modelName);
     case 'google':
       return analyzeResumesWithGemini(fileContents, modelName);
+    case 'claude':
+      return analyzeResumesWithClaude(fileContents, modelName);
     default:
       console.error("Unsupported model provider");
       return [];
@@ -94,7 +97,7 @@ async function analyzeResumesWithGemini(fileContents: string[], modelName: strin
         properties: {
           name: { type: SchemaType.STRING },
           selfAssessment: { type: SchemaType.STRING },
-          companyExperiences: {
+          companies: {
             type: SchemaType.ARRAY,
             items: {
               type: SchemaType.OBJECT,
@@ -124,7 +127,7 @@ async function analyzeResumesWithGemini(fileContents: string[], modelName: strin
   try {
     const systemPrompt = "You are an expert at structured data extraction. \
               Extract the following information from the given resume (in Chinese): \
-              name, self-assessment, company experiences (excluding project details), and graduate schools.";
+              name, self-assessment, companies (excluding project details), and graduate schools.";
 
     for (const content of fileContents) {
       const prompt = `${systemPrompt}\n\nResume content:\n${content}`;
@@ -136,6 +139,97 @@ async function analyzeResumesWithGemini(fileContents: string[], modelName: strin
     return candidateDetails;
   } catch (error) {
     console.error("Error in analyzeResumesWithGemini:", error);
+    return [];
+  }
+}
+
+async function analyzeResumesWithClaude(fileContents: string[], model: string): Promise<CandidateInfoType[]> {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    console.error("Anthropic API key is not set");
+    return [];
+  }
+
+  const client = new Anthropic({
+    apiKey: apiKey,
+  });
+
+  const candidateDetails: CandidateInfoType[] = [];
+
+  const tools = [
+    {
+      name: "extract_candidate_resume_info",
+      description: "Extract resume information about a candidate.",
+      input_schema: {
+        type: "object",
+        properties: {
+          name: { type: "string", description: "Name of the candidate" },
+          selfAssessment: { type: "string", description: "Self-assessment of the candidate" },
+          companies: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                name: { type: "string", description: "Name of the company" },
+                duration: { type: "string", description: "Duration of the company" }
+              },
+              required: ["name", "duration"]
+            },
+            description: "Array of companies of the candidate"
+          },
+          graduateSchools: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                name: { type: "string", description: "Name of the graduate school" },
+                duration: { type: "string", description: "Duration of the study" }
+              },
+              required: ["name", "duration"]
+            },
+            description: "Array of graduate schools"
+          }
+        },
+        required: ["name", "selfAssessment", "companies", "graduateSchools"]
+      }
+    }
+  ];
+
+  try {
+    for (const content of fileContents) {
+      const query = `
+        <resume>
+        ${content}
+        </resume>
+
+        Use the \`extract_candidate_resume_info\` tool to extract the candidate's resume information in Chinese.
+      `;
+
+      const response = await client.messages.create({
+        model: model, // This now uses the specific Claude model passed as an argument
+        max_tokens: 4096,
+        tools: tools as any,
+        messages: [{ role: "user", content: query }]
+      });
+
+      let jsonSummary = null;
+      for (const item of response.content) {
+        if (item.type === "tool_use" && item.name === "extract_candidate_resume_info") {
+          jsonSummary = item.input;
+          break;
+        }
+      }
+
+      if (jsonSummary) {
+        candidateDetails.push(jsonSummary as CandidateInfoType);
+      } else {
+        console.warn("No candidate summary found in the response.");
+      }
+    }
+
+    return candidateDetails;
+  } catch (error) {
+    console.error("Error in analyzeResumesWithClaude:", error);
     return [];
   }
 }
