@@ -120,7 +120,8 @@ export default function ResumeAnalyzer() {
               <SelectItem value="google:gemini-1.5-flash-exp-0827">Google: gemini-1.5-flash-exp-0827</SelectItem>
               <SelectItem value="google:gemini-1.5-pro-exp-0827">Google: gemini-1.5-pro-exp-0827</SelectItem>
               <SelectItem value="claude:claude-3-haiku-20240307">Claude: claude-3-haiku-20240307</SelectItem>
-              <SelectItem value="claude:claude-3-5-sonnet-20240620">Claude: claude-3-5-sonnet-20240620</SelectItem>              
+              <SelectItem value="claude:claude-3-5-sonnet-20240620">Claude: claude-3-5-sonnet-20240620</SelectItem>
+              <SelectItem value="deepseek:deepseek-chat">DeepSeek: deepseek-chat</SelectItem>
             </SelectContent>
           </Select>
 
