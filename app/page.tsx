@@ -1,9 +1,11 @@
-import { LandingPage } from "@/components/landing-page";
+import { LandingPage } from "@/components/landing-page"
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col">
-      <LandingPage />
-    </main>
-  );
+    <div className="flex flex-col min-h-screen">
+      <main className="flex-1">
+        <LandingPage />
+      </main>
+    </div>
+  )
 }

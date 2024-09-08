@@ -5,13 +5,13 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { ArrowRight, FileText, Zap, Lock } from "lucide-react"
-import { signIn } from "next-auth/react"
+import { signIn, useSession } from "next-auth/react"
 import { useRouter } from 'next/navigation'
-import { Header } from "@/components/ui/header"
 import { Footer } from "@/components/ui/footer"
 
 export function LandingPage() {
   const router = useRouter();
+  const { data: session } = useSession();
 
   const handleGoogleAuth = async () => {
     try {
@@ -26,9 +26,21 @@ export function LandingPage() {
     }
   };
 
+  const handleGetStarted = () => {
+    if (session) {
+      router.push('/resume-analyzer');
+    }
+    // If not logged in, the default link behavior will take effect
+  };
+
+  const handleFeatureClick = () => {
+    if (session) {
+      router.push('/resume-analyzer');
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
       <main className="flex-1 flex flex-col items-center">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
           <div className="container mx-auto px-4 md:px-6 max-w-6xl">
@@ -42,8 +54,15 @@ export function LandingPage() {
                 </p>
               </div>
               <div className="space-x-4">
-                <Button asChild>
-                  <Link href="#cta">Get Started</Link>
+                <Button 
+                  asChild={!session}
+                  onClick={session ? handleGetStarted : undefined}
+                >
+                  {session ? (
+                    <span>Get Started</span>
+                  ) : (
+                    <Link href="#cta">Get Started</Link>
+                  )}
                 </Button>
                 <Button variant="outline" asChild>
                   <Link href="#features">Learn More</Link>
@@ -58,39 +77,27 @@ export function LandingPage() {
               Key Features
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Zap className="w-5 h-5 mr-2" />
-                    AI-Powered Analysis
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>Our advanced AI algorithms extract key information from resumes with high accuracy.</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <FileText className="w-5 h-5 mr-2" />
-                    Bulk Processing
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>Upload multiple resumes at once and get analysis results for all of them quickly.</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Lock className="w-5 h-5 mr-2" />
-                    Secure & Private
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>Your data is encrypted and processed securely. We never store sensitive information.</p>
-                </CardContent>
-              </Card>
+              {[ 
+                { icon: Zap, title: "AI-Powered Analysis", description: "Our advanced AI algorithms extract key information from resumes with high accuracy." },
+                { icon: FileText, title: "Bulk Processing", description: "Upload multiple resumes at once and get analysis results for all of them quickly." },
+                { icon: Lock, title: "Secure & Private", description: "Your data is encrypted and processed securely. We never store sensitive information." }
+              ].map((feature, index) => (
+                <Card 
+                  key={index} 
+                  className={session ? "cursor-pointer transition-shadow hover:shadow-lg" : ""}
+                  onClick={session ? handleFeatureClick : undefined}
+                >
+                  <CardHeader>
+                    <CardTitle className="flex items-center">
+                      <feature.icon className="w-5 h-5 mr-2" />
+                      {feature.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p>{feature.description}</p>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         </section>

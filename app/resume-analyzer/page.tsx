@@ -1,13 +1,13 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Header } from "@/components/ui/header"
-import { Footer } from "@/components/ui/footer"
-import { Loader2 } from "lucide-react" // Add this import
+import { Loader2 } from "lucide-react"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 
 interface CandidateInfo {
   name: string;
@@ -17,6 +17,15 @@ interface CandidateInfo {
 }
 
 export default function ResumeAnalyzer() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push('/')
+    }
+  }, [status, router])
+
   const [files, setFiles] = useState<File[]>([])
   const [results, setResults] = useState<CandidateInfo[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -87,12 +96,19 @@ export default function ResumeAnalyzer() {
     }
   }
 
+  if (status === "loading") {
+    return <div>Loading...</div>
+  }
+
+  if (!session) {
+    return null // This will prevent any flash of content before redirect
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
       <main className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
         <div className="space-y-6">
-          <h1 className="text-2xl font-bold">简历关键信息自动提取</h1>
+          <h2 className="text-xl font-semibold text-gray-700">简历关键信息自动提取</h2>
           
           <Select onValueChange={handleModelChange} defaultValue={selectedModel}>
             <SelectTrigger className="w-[250px]">
@@ -175,7 +191,6 @@ export default function ResumeAnalyzer() {
           )}
         </div>
       </main>
-      <Footer />
     </div>
   )
 }

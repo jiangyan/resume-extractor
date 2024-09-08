@@ -1,21 +1,36 @@
-import Link from "next/link"
-import { FileText } from "lucide-react"
+'use client'
+
+import { FileText } from 'lucide-react'
+import { Button } from "@/components/ui/button"
+import { signIn, signOut, useSession } from "next-auth/react"
+import Link from 'next/link'
 
 export function Header() {
+  const { data: session, status } = useSession()
+
   return (
-    <header className="px-4 lg:px-6 h-14 flex items-center justify-between max-w-7xl mx-auto w-full">
-      <Link className="flex items-center justify-center" href="/">
-        <FileText className="h-6 w-6 mr-2" />
-        <span className="font-bold">ResumeAI</span>
-      </Link>
-      <nav className="flex gap-4 sm:gap-6">
-        <Link className="text-sm font-medium hover:underline underline-offset-4" href="/#features">
-          Features
+    <header className="bg-white shadow-sm">
+      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
+          <FileText className="mr-2 h-6 w-6 text-blue-600" />
+          <h1 className="text-xl font-bold text-gray-800">Resume AI</h1>
         </Link>
-        <Link className="text-sm font-medium hover:underline underline-offset-4" href="/#cta">
-          Get Started
-        </Link>
-      </nav>
+        <div>
+          {status === "authenticated" ? (
+            <Button onClick={() => signOut({ callbackUrl: '/' })} variant="outline" className="text-sm">
+              Logout
+            </Button>
+          ) : status === "unauthenticated" ? (
+            <Button onClick={() => signIn("google")} variant="outline" className="text-sm">
+              Sign in with Google
+            </Button>
+          ) : (
+            <Button variant="outline" className="text-sm" disabled>
+              Loading...
+            </Button>
+          )}
+        </div>
+      </div>
     </header>
   )
 }
