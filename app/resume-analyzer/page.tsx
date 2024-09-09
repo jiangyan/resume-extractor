@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2 } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import { Download } from "lucide-react"; // 确保你已经安装了 lucide-react
+import * as XLSX from 'xlsx'; // Changed this line
 
 interface CandidateInfo {
   name: string;
@@ -38,6 +40,32 @@ export default function ResumeAnalyzer() {
       setFiles(Array.from(event.target.files))
     }
   }
+
+  const handleExport = () => {
+    const ws = XLSX.utils.json_to_sheet(results.map((result, index) => ({
+      '序号': index + 1,
+      '姓名': result.name,
+      '自我评价': result.selfAssessment,
+      '公司经历': result.companies.map(exp => `${exp.name} (${exp.duration})`).join('; '),
+      '毕业学校': result.graduateSchools.map(school => `${school.name} (${school.duration})`).join('; ')
+    })));
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "简历关键数据"); // 更改sheet名称
+
+    // 使用原生 JavaScript 生成时间戳
+    const now = new Date();
+    const timestamp = now.getFullYear().toString() +
+      (now.getMonth() + 1).toString().padStart(2, '0') +
+      now.getDate().toString().padStart(2, '0') +
+      now.getHours().toString().padStart(2, '0') +
+      now.getMinutes().toString().padStart(2, '0');
+  
+    const fileName = `简历关键信息-${timestamp}.xlsx`;
+
+    // 导出 Excel 文件
+    XLSX.writeFile(wb, fileName);
+  };
 
   const readFileAsText = async (file: File): Promise<string> => {
     if (file.type === 'application/pdf') {
@@ -131,9 +159,9 @@ export default function ResumeAnalyzer() {
               accept=".pdf,.txt" 
               multiple 
               onChange={handleFileChange}
-              className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"
+              className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 h-12 py-1.5" // 修改这里
             />
-            <p className="text-sm text-gray-500">{files.length} file(s) selected</p>
+            <p className="text-sm text-gray-500 mt-2">{files.length} file(s) selected</p>
           </div>
           <div className="flex items-center space-x-4">
             <Button 
@@ -147,11 +175,23 @@ export default function ResumeAnalyzer() {
                 </>
               ) : '提取关键信息'}
             </Button>
+
+            {results.length > 0 && (
+              <Button 
+                onClick={handleExport} 
+                className="bg-[#0056b3] hover:bg-[#0069d9] text-white flex items-center transition-colors duration-200"
+              >
+                <Download className="mr-2" />
+                导出
+              </Button>
+            )}
+
             {currentFile && (
               <p className="text-sm text-gray-600">
                 第 {currentFileIndex} 份简历 (共 {files.length} 份简历)，{currentFile} 正在处理中...
               </p>
             )}
+            
           </div>
           
           {results.length > 0 && (
