@@ -10,6 +10,9 @@ Resume Extractor is an AI-powered tool that helps users extract key information 
   - OpenAI: gpt-4o-2024-08-06
   - Google: gemini-1.5-flash
   - Google: gemini-1.5-pro
+  - Claude: claude-3-haiku-20240307
+  - Claude: claude-3-5-sonnet-20240620
+  - DeepSeek: deepseek-chat
 - Identifies and extracts:
   - Name
   - Self-assessment
@@ -20,9 +23,11 @@ Resume Extractor is an AI-powered tool that helps users extract key information 
 
 ## Key Technology
 
-- **Multi-Model AI-Driven Extraction**: Employs advanced AI models from OpenAI and Google to understand and parse complex resume formats
+- **Multi-Model AI-Driven Extraction**: Employs advanced AI models from OpenAI, Google, Anthropic (Claude), and DeepSeek to understand and parse complex resume formats
 - **OpenAI GPT Models**: Utilizes the latest GPT models for precise information extraction
 - **Google Gemini Models**: Leverages Gemini's capabilities for structured output and efficient processing
+- **Claude Models**: Incorporates Anthropic's Claude for advanced natural language understanding
+- **DeepSeek Models**: Utilizes DeepSeek's AI capabilities for enhanced resume parsing
 - **PDF Processing**: Handles various PDF formats and layouts
 - **v0.dev**: Used for designing the entire UI, generating shadcn-compatible components
 - **shadcn UI**: Utilized for rapid development of a sleek, modern interface
@@ -85,7 +90,10 @@ It's 99% AI generated codes, I only input English, then tab, tab, tab, ta-da, us
 
 ## Acknowledgments
 
-- OpenAI for providing the AI models and Structured Output capabilities
+- OpenAI for providing the GPT models and Structured Output capabilities
+- Google for the Gemini AI models
+- Anthropic for the Claude AI models
+- DeepSeek for their AI capabilities
 - [v0.dev](https://v0.dev/) for UI design and component generation
 - [shadcn UI](https://ui.shadcn.com/) for the component library
 - Cursor AI for assisting with feature completion
