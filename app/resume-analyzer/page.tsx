@@ -8,6 +8,62 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2 } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import { Download } from "lucide-react"; // 确保你已经安装了 lucide-react
+import * as XLSX from 'xlsx'; // Changed this line
+import { ColumnDef } from "@tanstack/react-table"
+
+// Define column names
+const columnNames = {
+  index: '序号',
+  name: '姓名',
+  selfAssessment: '自我评价',
+  companies: '公司经历',
+  graduateSchools: '毕业学校'
+};
+
+// Define the columns
+const columns: ColumnDef<CandidateInfo>[] = [
+  {
+    accessorKey: "index",
+    header: columnNames.index,
+    cell: ({ row }) => row.index + 1,
+  },
+  {
+    accessorKey: "name",
+    header: columnNames.name,
+  },
+  {
+    accessorKey: "selfAssessment",
+    header: columnNames.selfAssessment,
+    cell: ({ row }) => (
+      <div className="whitespace-normal break-words">
+        {row.original.selfAssessment}
+      </div>
+    ),
+  },
+  {
+    accessorKey: "companies",
+    header: columnNames.companies,
+    cell: ({ row }) => (
+      <>
+        {row.original.companies.map((exp, i) => (
+          <div key={i}>{exp.name} ({exp.duration})</div>
+        ))}
+      </>
+    ),
+  },
+  {
+    accessorKey: "graduateSchools",
+    header: columnNames.graduateSchools,
+    cell: ({ row }) => (
+      <>
+        {row.original.graduateSchools.map((school, i) => (
+          <div key={i}>{school.name} ({school.duration})</div>
+        ))}
+      </>
+    ),
+  },
+];
 
 interface CandidateInfo {
   name: string;
@@ -38,6 +94,33 @@ export default function ResumeAnalyzer() {
       setFiles(Array.from(event.target.files))
     }
   }
+
+  const handleExport = () => {
+    const exportData = results.map((result, index) => ({
+      [columnNames.index]: index + 1,
+      [columnNames.name]: result.name,
+      [columnNames.selfAssessment]: result.selfAssessment,
+      [columnNames.companies]: result.companies.map(exp => `${exp.name} (${exp.duration})`).join('; '),
+      [columnNames.graduateSchools]: result.graduateSchools.map(school => `${school.name} (${school.duration})`).join('; ')
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+    // 使用原生 JavaScript 生成时间戳
+    const now = new Date();
+    const timestamp = now.getFullYear().toString() +
+      (now.getMonth() + 1).toString().padStart(2, '0') +
+      now.getDate().toString().padStart(2, '0') +
+      now.getHours().toString().padStart(2, '0') +
+      now.getMinutes().toString().padStart(2, '0');
+  
+    const fileName = `简历关键信息-${timestamp}.xlsx`;
+
+    // 导出 Excel 文件
+    XLSX.writeFile(wb, fileName);
+  };
 
   const readFileAsText = async (file: File): Promise<string> => {
     if (file.type === 'application/pdf') {
@@ -131,9 +214,9 @@ export default function ResumeAnalyzer() {
               accept=".pdf,.txt" 
               multiple 
               onChange={handleFileChange}
-              className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"
+              className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 h-12 py-1.5" // 修改这里
             />
-            <p className="text-sm text-gray-500">{files.length} file(s) selected</p>
+            <p className="text-sm text-gray-500 mt-2">{files.length} file(s) selected</p>
           </div>
           <div className="flex items-center space-x-4">
             <Button 
@@ -147,11 +230,23 @@ export default function ResumeAnalyzer() {
                 </>
               ) : '提取关键信息'}
             </Button>
+
+            {results.length > 0 && (
+              <Button 
+                onClick={handleExport} 
+                className="bg-[#0056b3] hover:bg-[#0069d9] text-white flex items-center transition-colors duration-200"
+              >
+                <Download className="mr-2" />
+                导出
+              </Button>
+            )}
+
             {currentFile && (
               <p className="text-sm text-gray-600">
                 第 {currentFileIndex} 份简历 (共 {files.length} 份简历)，{currentFile} 正在处理中...
               </p>
             )}
+            
           </div>
           
           {results.length > 0 && (
