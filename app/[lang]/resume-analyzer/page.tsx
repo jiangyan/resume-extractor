@@ -5,65 +5,45 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2 } from "lucide-react"
+import { Loader2, Download } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { Download } from "lucide-react"; // 确保你已经安装了 lucide-react
-import * as XLSX from 'xlsx'; // Changed this line
-import { ColumnDef } from "@tanstack/react-table"
+import * as XLSX from 'xlsx'
 
-// Define column names
-const columnNames = {
-  index: '序号',
-  name: '姓名',
-  selfAssessment: '自我评价',
-  companies: '公司经历',
-  graduateSchools: '毕业学校'
-};
-
-// Define the columns
-const columns: ColumnDef<CandidateInfo>[] = [
-  {
-    accessorKey: "index",
-    header: columnNames.index,
-    cell: ({ row }) => row.index + 1,
+const translations = {
+  en: {
+    title: "Resume Key Information Auto-Extraction",
+    selectModel: "Select Model",
+    filesSelected: "file(s) selected",
+    extractKeyInfo: "Extract Key Information",
+    processing: "Processing...",
+    export: "Export",
+    processingFile: "Processing file",
+    of: "of",
+    index: "Index",
+    name: "Name",
+    selfAssessment: "Self Assessment",
+    companies: "Companies",
+    graduateSchools: "Graduate Schools",
+    loading: "Loading...",
   },
-  {
-    accessorKey: "name",
-    header: columnNames.name,
-  },
-  {
-    accessorKey: "selfAssessment",
-    header: columnNames.selfAssessment,
-    cell: ({ row }) => (
-      <div className="whitespace-normal break-words">
-        {row.original.selfAssessment}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "companies",
-    header: columnNames.companies,
-    cell: ({ row }) => (
-      <>
-        {row.original.companies.map((exp, i) => (
-          <div key={i}>{exp.name} ({exp.duration})</div>
-        ))}
-      </>
-    ),
-  },
-  {
-    accessorKey: "graduateSchools",
-    header: columnNames.graduateSchools,
-    cell: ({ row }) => (
-      <>
-        {row.original.graduateSchools.map((school, i) => (
-          <div key={i}>{school.name} ({school.duration})</div>
-        ))}
-      </>
-    ),
-  },
-];
+  zh: {
+    title: "简历关键信息自动提取",
+    selectModel: "选择模型",
+    filesSelected: "个文件已选择",
+    extractKeyInfo: "提取关键信息",
+    processing: "处理中...",
+    export: "导出",
+    processingFile: "正在处理第",
+    of: "份简历 (共",
+    index: "序号",
+    name: "姓名",
+    selfAssessment: "自我评价",
+    companies: "公司经历",
+    graduateSchools: "毕业学校",
+    loading: "加载中...",
+  }
+}
 
 interface CandidateInfo {
   name: string;
@@ -72,15 +52,10 @@ interface CandidateInfo {
   graduateSchools: { name: string; duration: string; }[];
 }
 
-export default function ResumeAnalyzer() {
+export default function ResumeAnalyzer({ params: { lang } }: { params: { lang: string } }) {
   const { data: session, status } = useSession()
   const router = useRouter()
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push('/')
-    }
-  }, [status, router])
+  const t = translations[lang as keyof typeof translations]
 
   const [files, setFiles] = useState<File[]>([])
   const [results, setResults] = useState<CandidateInfo[]>([])
@@ -88,6 +63,12 @@ export default function ResumeAnalyzer() {
   const [currentFile, setCurrentFile] = useState<string | null>(null)
   const [selectedModel, setSelectedModel] = useState<string>("openai:gpt-4o-mini-2024-07-18")
   const [currentFileIndex, setCurrentFileIndex] = useState<number>(0)
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push(`/${lang}`)
+    }
+  }, [status, router, lang])
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -97,18 +78,17 @@ export default function ResumeAnalyzer() {
 
   const handleExport = () => {
     const exportData = results.map((result, index) => ({
-      [columnNames.index]: index + 1,
-      [columnNames.name]: result.name,
-      [columnNames.selfAssessment]: result.selfAssessment,
-      [columnNames.companies]: result.companies.map(exp => `${exp.name} (${exp.duration})`).join('; '),
-      [columnNames.graduateSchools]: result.graduateSchools.map(school => `${school.name} (${school.duration})`).join('; ')
+      [t.index]: index + 1,
+      [t.name]: result.name,
+      [t.selfAssessment]: result.selfAssessment,
+      [t.companies]: result.companies.map(exp => `${exp.name} (${exp.duration})`).join('; '),
+      [t.graduateSchools]: result.graduateSchools.map(school => `${school.name} (${school.duration})`).join('; ')
     }));
 
     const ws = XLSX.utils.json_to_sheet(exportData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 
-    // 使用原生 JavaScript 生成时间戳
     const now = new Date();
     const timestamp = now.getFullYear().toString() +
       (now.getMonth() + 1).toString().padStart(2, '0') +
@@ -116,9 +96,8 @@ export default function ResumeAnalyzer() {
       now.getHours().toString().padStart(2, '0') +
       now.getMinutes().toString().padStart(2, '0');
   
-    const fileName = `简历关键信息-${timestamp}.xlsx`;
+    const fileName = `${lang === 'en' ? 'Resume_Key_Info' : '简历关键信息'}-${timestamp}.xlsx`;
 
-    // 导出 Excel 文件
     XLSX.writeFile(wb, fileName);
   };
 
@@ -180,22 +159,22 @@ export default function ResumeAnalyzer() {
   }
 
   if (status === "loading") {
-    return <div>Loading...</div>
+    return <div>{t.loading}</div>
   }
 
   if (!session) {
-    return null // This will prevent any flash of content before redirect
+    return null
   }
 
   return (
     <div className="flex flex-col min-h-screen">
       <main className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
         <div className="space-y-6">
-          <h2 className="text-xl font-semibold text-gray-700">简历关键信息自动提取</h2>
+          <h2 className="text-xl font-semibold text-gray-700">{t.title}</h2>
           
           <Select onValueChange={handleModelChange} defaultValue={selectedModel}>
             <SelectTrigger className="w-[250px]">
-              <SelectValue placeholder="选择模型" />
+              <SelectValue placeholder={t.selectModel} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="openai:gpt-4o-mini-2024-07-18">OpenAI: gpt-4o-mini-2024-07-18</SelectItem>
@@ -214,9 +193,9 @@ export default function ResumeAnalyzer() {
               accept=".pdf,.txt" 
               multiple 
               onChange={handleFileChange}
-              className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 h-12 py-1.5" // 修改这里
+              className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 h-12 py-1.5"
             />
-            <p className="text-sm text-gray-500 mt-2">{files.length} file(s) selected</p>
+            <p className="text-sm text-gray-500 mt-2">{files.length} {t.filesSelected}</p>
           </div>
           <div className="flex items-center space-x-4">
             <Button 
@@ -226,9 +205,9 @@ export default function ResumeAnalyzer() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  处理中...
+                  {t.processing}
                 </>
-              ) : '提取关键信息'}
+              ) : t.extractKeyInfo}
             </Button>
 
             {results.length > 0 && (
@@ -237,13 +216,13 @@ export default function ResumeAnalyzer() {
                 className="bg-[#0056b3] hover:bg-[#0069d9] text-white flex items-center transition-colors duration-200"
               >
                 <Download className="mr-2" />
-                导出
+                {t.export}
               </Button>
             )}
 
             {currentFile && (
               <p className="text-sm text-gray-600">
-                第 {currentFileIndex} 份简历 (共 {files.length} 份简历)，{currentFile} 正在处理中...
+                {t.processingFile} {currentFileIndex} {t.of} {files.length}), {currentFile} {t.processing}
               </p>
             )}
             
@@ -253,11 +232,11 @@ export default function ResumeAnalyzer() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[50px]">序号</TableHead>
-                  <TableHead className="w-[100px]">姓名</TableHead>
-                  <TableHead className="w-[400px]">自我评价</TableHead>
-                  <TableHead>公司经历</TableHead>
-                  <TableHead>毕业学校</TableHead>
+                  <TableHead className="w-[50px]">{t.index}</TableHead>
+                  <TableHead className="w-[100px]">{t.name}</TableHead>
+                  <TableHead className="w-[400px]">{t.selfAssessment}</TableHead>
+                  <TableHead>{t.companies}</TableHead>
+                  <TableHead>{t.graduateSchools}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

@@ -7,15 +7,14 @@ import Link from "next/link"
 import { ArrowRight, FileText, Zap, Lock } from "lucide-react"
 import { signIn, useSession } from "next-auth/react"
 import { useRouter } from 'next/navigation'
-import { Footer } from "@/components/ui/footer"
 
-export function LandingPage() {
+export function LandingPage({ lang }: { lang: string }) {
   const router = useRouter();
   const { data: session } = useSession();
 
   const handleGoogleAuth = async () => {
     try {
-      const result = await signIn("google", { callbackUrl: "/resume-analyzer", redirect: false });
+      const result = await signIn("google", { callbackUrl: `/${lang}/resume-analyzer`, redirect: false });
       if (result?.error) {
         console.error("Sign-in error:", result.error);
       } else if (result?.url) {
@@ -28,16 +27,57 @@ export function LandingPage() {
 
   const handleGetStarted = () => {
     if (session) {
-      router.push('/resume-analyzer');
+      router.push(`/${lang}/resume-analyzer`);
     }
     // If not logged in, the default link behavior will take effect
   };
 
   const handleFeatureClick = () => {
     if (session) {
-      router.push('/resume-analyzer');
+      router.push(`/${lang}/resume-analyzer`);
     }
   };
+
+  const translations = {
+    en: {
+      title: "Extract Key Info from Resumes with AI",
+      description: "Streamline your hiring process with our AI-powered resume analysis tool. Get key insights in seconds.",
+      getStarted: "Get Started",
+      learnMore: "Learn More",
+      keyFeatures: "Key Features",
+      aiPoweredAnalysis: "AI-Powered Analysis",
+      aiPoweredAnalysisDescription: "Our advanced AI algorithms extract key information from resumes with high accuracy.",
+      bulkProcessing: "Bulk Processing",
+      bulkProcessingDescription: "Upload multiple resumes at once and get analysis results for all of them quickly.",
+      securePrivate: "Secure & Private",
+      securePrivateDescription: "Your data is encrypted and processed securely. We never store sensitive information.",
+      readyToStreamline: "Ready to Streamline Your Hiring?",
+      readyToStreamlineDescription: "Sign up now and start analyzing resumes with the power of AI.",
+      signUp: "Sign Up",
+      orSignInWith: "Or sign in with:",
+      signInWithGoogle: "Sign in with Google"
+    },
+    zh: {
+      title: "使用AI从简历中提取关键信息",
+      description: "使用我们的AI驱动的简历分析工具简化您的招聘流程。在几秒钟内获得关键见解。",
+      getStarted: "开始使用",
+      learnMore: "了解更多",
+      keyFeatures: "关键特性",
+      aiPoweredAnalysis: "AI驱动分析",
+      aiPoweredAnalysisDescription: "我们的高级AI算法以高精度从简历中提取关键信息。",
+      bulkProcessing: "批量处理",
+      bulkProcessingDescription: "一次上传多份简历并快速获取所有分析结果。",
+      securePrivate: "安全和私密",
+      securePrivateDescription: "您的数据经过加密并安全处理。我们永远不会存储敏感信息。",
+      readyToStreamline: "准备简化您的招聘流程了吗？",
+      readyToStreamlineDescription: "立即注册并开始使用AI分析简历。",
+      signUp: "注册",
+      orSignInWith: "或使用以下方式登录：",
+      signInWithGoogle: "使用谷歌登录"
+    }
+  }
+
+  const t = translations[lang as keyof typeof translations]
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -47,10 +87,10 @@ export function LandingPage() {
             <div className="flex flex-col items-center space-y-4 text-center">
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
-                  Extract Key Info from Resumes with AI
+                  {t.title}
                 </h1>
                 <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
-                  Streamline your hiring process with our AI-powered resume analysis tool. Get key insights in seconds.
+                  {t.description}
                 </p>
               </div>
               <div className="space-x-4">
@@ -59,13 +99,13 @@ export function LandingPage() {
                   onClick={session ? handleGetStarted : undefined}
                 >
                   {session ? (
-                    <span>Get Started</span>
+                    <span>{t.getStarted}</span>
                   ) : (
-                    <Link href="#cta">Get Started</Link>
+                    <Link href="#cta">{t.getStarted}</Link>
                   )}
                 </Button>
                 <Button variant="outline" asChild>
-                  <Link href="#features">Learn More</Link>
+                  <Link href="#features">{t.learnMore}</Link>
                 </Button>
               </div>
             </div>
@@ -74,13 +114,13 @@ export function LandingPage() {
         <section id="features" className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
           <div className="container mx-auto px-4 md:px-6 max-w-6xl">
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-12">
-              Key Features
+              {t.keyFeatures}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[ 
-                { icon: Zap, title: "AI-Powered Analysis", description: "Our advanced AI algorithms extract key information from resumes with high accuracy." },
-                { icon: FileText, title: "Bulk Processing", description: "Upload multiple resumes at once and get analysis results for all of them quickly." },
-                { icon: Lock, title: "Secure & Private", description: "Your data is encrypted and processed securely. We never store sensitive information." }
+                { icon: Zap, title: t.aiPoweredAnalysis, description: t.aiPoweredAnalysisDescription },
+                { icon: FileText, title: t.bulkProcessing, description: t.bulkProcessingDescription },
+                { icon: Lock, title: t.securePrivate, description: t.securePrivateDescription }
               ].map((feature, index) => (
                 <Card 
                   key={index} 
@@ -106,10 +146,10 @@ export function LandingPage() {
             <div className="flex flex-col items-center space-y-4 text-center">
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  Ready to Streamline Your Hiring?
+                  {t.readyToStreamline}
                 </h2>
                 <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl dark:text-gray-400">
-                  Sign up now and start analyzing resumes with the power of AI.
+                  {t.readyToStreamlineDescription}
                 </p>
               </div>
               <div className="w-full max-w-sm space-y-2">
@@ -121,12 +161,12 @@ export function LandingPage() {
                     required
                   />
                   <Button type="submit">
-                    Sign Up
+                    {t.signUp}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </form>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Or sign in with:
+                  {t.orSignInWith}
                 </p>
                 <Button variant="outline" className="w-full" onClick={handleGoogleAuth}>
                   <svg
@@ -141,14 +181,13 @@ export function LandingPage() {
                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                     <path d="M1 1h22v22H1z" fill="none" />
                   </svg>
-                  Sign in with Google
+                  {t.signInWithGoogle}
                 </Button>
               </div>
             </div>
           </div>
         </section>
       </main>
-      <Footer />
     </div>
   )
 }
