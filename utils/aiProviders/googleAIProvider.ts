@@ -48,8 +48,7 @@ export async function analyzeResumesWithGemini(fileContents: string[], modelName
 
   try {
     const systemPrompt = "You are an expert at structured data extraction. \
-              Extract the following information from the given resume (in Chinese): \
-              name, self-assessment, companies (excluding project details), and graduate schools.";
+              Extract candidate information from the given resume (in Chinese):";
 
     for (const content of fileContents) {
       const prompt = `${systemPrompt}\n\nResume content:\n${content}`;
