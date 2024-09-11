@@ -86,10 +86,10 @@ export function LandingPage({ lang }: { lang: string }) {
           <div className="container mx-auto px-4 md:px-6 max-w-6xl">
             <div className="flex flex-col items-center space-y-4 text-center">
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
+                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none dark:text-white">
                   {t.title}
                 </h1>
-                <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
+                <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-300">
                   {t.description}
                 </p>
               </div>
@@ -113,7 +113,7 @@ export function LandingPage({ lang }: { lang: string }) {
         </section>
         <section id="features" className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800">
           <div className="container mx-auto px-4 md:px-6 max-w-6xl">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-12">
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-center mb-12 dark:text-white">
               {t.keyFeatures}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -124,17 +124,17 @@ export function LandingPage({ lang }: { lang: string }) {
               ].map((feature, index) => (
                 <Card 
                   key={index} 
-                  className={session ? "cursor-pointer transition-shadow hover:shadow-lg" : ""}
+                  className={`${session ? "cursor-pointer transition-shadow hover:shadow-lg" : ""} dark:bg-gray-700 dark:text-gray-100`}
                   onClick={session ? handleFeatureClick : undefined}
                 >
                   <CardHeader>
-                    <CardTitle className="flex items-center">
+                    <CardTitle className="flex items-center dark:text-white">
                       <feature.icon className="w-5 h-5 mr-2" />
                       {feature.title}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p>{feature.description}</p>
+                    <p className="dark:text-gray-300">{feature.description}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -145,10 +145,10 @@ export function LandingPage({ lang }: { lang: string }) {
           <div className="container mx-auto px-4 md:px-6 max-w-6xl">
             <div className="flex flex-col items-center space-y-4 text-center">
               <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl dark:text-white">
                   {t.readyToStreamline}
                 </h2>
-                <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl dark:text-gray-400">
+                <p className="mx-auto max-w-[600px] text-gray-500 md:text-xl dark:text-gray-300">
                   {t.readyToStreamlineDescription}
                 </p>
               </div>

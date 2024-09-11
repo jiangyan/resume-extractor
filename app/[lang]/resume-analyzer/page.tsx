@@ -170,10 +170,10 @@ export default function ResumeAnalyzer({ params: { lang } }: { params: { lang: s
     <div className="flex flex-col min-h-screen">
       <main className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
         <div className="space-y-6">
-          <h2 className="text-xl font-semibold text-gray-700">{t.title}</h2>
+          <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">{t.title}</h2>
           
           <Select onValueChange={handleModelChange} defaultValue={selectedModel}>
-            <SelectTrigger className="w-[250px]">
+            <SelectTrigger className="w-[250px] dark:bg-gray-700 dark:text-gray-200">
               <SelectValue placeholder={t.selectModel} />
             </SelectTrigger>
             <SelectContent>
@@ -193,9 +193,9 @@ export default function ResumeAnalyzer({ params: { lang } }: { params: { lang: s
               accept=".pdf,.txt" 
               multiple 
               onChange={handleFileChange}
-              className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 h-12 py-1.5"
+              className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 h-12 py-1.5 dark:bg-gray-700 dark:text-gray-200"
             />
-            <p className="text-sm text-gray-500 mt-2">{files.length} {t.filesSelected}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">{files.length} {t.filesSelected}</p>
           </div>
           <div className="flex items-center space-x-4">
             <Button 
@@ -221,7 +221,7 @@ export default function ResumeAnalyzer({ params: { lang } }: { params: { lang: s
             )}
 
             {currentFile && (
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 {t.processingFile} {currentFileIndex} {t.of} {files.length}), {currentFile} {t.processing}
               </p>
             )}
@@ -232,29 +232,29 @@ export default function ResumeAnalyzer({ params: { lang } }: { params: { lang: s
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[50px]">{t.index}</TableHead>
-                  <TableHead className="w-[100px]">{t.name}</TableHead>
-                  <TableHead className="w-[400px]">{t.selfAssessment}</TableHead>
-                  <TableHead>{t.companies}</TableHead>
-                  <TableHead>{t.graduateSchools}</TableHead>
+                  <TableHead className="w-[50px] dark:text-gray-200">{t.index}</TableHead>
+                  <TableHead className="w-[100px] dark:text-gray-200">{t.name}</TableHead>
+                  <TableHead className="w-[400px] dark:text-gray-200">{t.selfAssessment}</TableHead>
+                  <TableHead className="dark:text-gray-200">{t.companies}</TableHead>
+                  <TableHead className="dark:text-gray-200">{t.graduateSchools}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {results.map((result, index) => (
                   <TableRow key={index}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>{result.name}</TableCell>
-                    <TableCell className="w-[200px]">
+                    <TableCell className="dark:text-gray-300">{index + 1}</TableCell>
+                    <TableCell className="dark:text-gray-300">{result.name}</TableCell>
+                    <TableCell className="w-[200px] dark:text-gray-300">
                       <div className="whitespace-normal break-words">
                         {result.selfAssessment}
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="dark:text-gray-300">
                       {result.companies.map((exp, i) => (
                         <div key={i}>{exp.name} ({exp.duration})</div>
                       ))}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="dark:text-gray-300">
                       {result.graduateSchools.map((school, i) => (
                         <div key={i}>{school.name} ({school.duration})</div>
                       ))}

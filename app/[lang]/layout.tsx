@@ -26,8 +26,8 @@ export default function RootLayout({
   params: { lang: string }
 }) {
   return (
-    <html lang={params.lang}>
-      <body className={inter.className}>
+    <html lang={params.lang} suppressHydrationWarning>
+      <body className={`${inter.className} dark:bg-gray-900 dark:text-gray-100`}>
         <ClientProviders>
           <div className="flex flex-col min-h-screen">
             <Header lang={params.lang} />
