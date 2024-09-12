@@ -9,6 +9,7 @@ import { Loader2, Download } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import * as XLSX from 'xlsx'
+import { aiModels } from '@/utils/aiProviders/models'
 
 const translations = {
   en: {
@@ -61,8 +62,9 @@ export default function ResumeAnalyzer({ params: { lang } }: { params: { lang: s
   const [results, setResults] = useState<CandidateInfo[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [currentFile, setCurrentFile] = useState<string | null>(null)
-  const [selectedModel, setSelectedModel] = useState<string>("openai:gpt-4o-mini-2024-07-18")
+  const [selectedModel, setSelectedModel] = useState<string>(aiModels[0].value)
   const [currentFileIndex, setCurrentFileIndex] = useState<number>(0)
+  const [totalFiles, setTotalFiles] = useState<number>(0)
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -72,7 +74,9 @@ export default function ResumeAnalyzer({ params: { lang } }: { params: { lang: s
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      setFiles(Array.from(event.target.files))
+      const fileArray = Array.from(event.target.files)
+      setFiles(fileArray)
+      setTotalFiles(fileArray.length)
     }
   }
 
@@ -177,13 +181,11 @@ export default function ResumeAnalyzer({ params: { lang } }: { params: { lang: s
               <SelectValue placeholder={t.selectModel} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="openai:gpt-4o-mini-2024-07-18">OpenAI: gpt-4o-mini-2024-07-18</SelectItem>
-              <SelectItem value="openai:gpt-4o-2024-08-06">OpenAI: gpt-4o-2024-08-06</SelectItem>
-              <SelectItem value="google:gemini-1.5-flash-exp-0827">Google: gemini-1.5-flash-exp-0827</SelectItem>
-              <SelectItem value="google:gemini-1.5-pro-exp-0827">Google: gemini-1.5-pro-exp-0827</SelectItem>
-              <SelectItem value="claude:claude-3-haiku-20240307">Claude: claude-3-haiku-20240307</SelectItem>
-              <SelectItem value="claude:claude-3-5-sonnet-20240620">Claude: claude-3-5-sonnet-20240620</SelectItem>
-              <SelectItem value="deepseek:deepseek-chat">DeepSeek: deepseek-chat</SelectItem>
+              {aiModels.map((model) => (
+                <SelectItem key={model.value} value={model.value}>
+                  {model.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
@@ -210,12 +212,12 @@ export default function ResumeAnalyzer({ params: { lang } }: { params: { lang: s
               ) : t.extractKeyInfo}
             </Button>
 
-            {results.length > 0 && (
+            {results.length > 0 && results.length === totalFiles && (
               <Button 
                 onClick={handleExport} 
-                className="bg-[#0056b3] hover:bg-[#0069d9] text-white flex items-center transition-colors duration-200"
+                className="bg-primary hover:bg-primary/90"
               >
-                <Download className="mr-2" />
+                <Download className="mr-2 h-4 w-4" />
                 {t.export}
               </Button>
             )}
