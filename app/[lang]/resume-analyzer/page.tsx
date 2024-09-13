@@ -10,6 +10,7 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import * as XLSX from 'xlsx'
 import { aiModels } from '@/utils/aiProviders/models'
+import { LoadingTextAnimationComponent } from "@/components/loading-text-animation"
 
 const translations = {
   en: {
@@ -222,10 +223,12 @@ export default function ResumeAnalyzer({ params: { lang } }: { params: { lang: s
               </Button>
             )}
 
-            {currentFile && (
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                {t.processingFile} {currentFileIndex} {t.of} {files.length}), {currentFile} {t.processing}
-              </p>
+            {isLoading && (
+              <div className="flex-1 h-6 overflow-hidden text-sm">
+                <LoadingTextAnimationComponent 
+                  text={`${t.processingFile} ${currentFileIndex} ${t.of} ${files.length}, ${currentFile || ''}`} 
+                />
+              </div>
             )}
             
           </div>
