@@ -1,28 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import formidable from 'formidable'
 import fs from 'fs'
-import { PDFExtract, PDFExtractOptions } from 'pdf.js-extract'
+import PDFParser from 'pdf2json'
 
 export const config = {
   api: {
     bodyParser: false,
   },
-}
-
-// In-memory worker setup
-const workerScript = `
-  const { parentPort } = require('worker_threads');
-  parentPort.on('message', (event) => {
-    const { action, data } = event;
-    if (action === 'getDocument') {
-      parentPort.postMessage({ action: 'workerLoaded' });
-    }
-  });
-`;
-
-// Extend the global interface to include our custom property
-declare global {
-  var pdfjsWorker: { worker: any } | undefined;
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -40,23 +24,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'No file uploaded' })
     }
 
-    // Set up in-memory worker
-    if (typeof window === 'undefined' && !global.pdfjsWorker) {
-      const { Worker } = require('worker_threads');
-      const worker = new Worker(
-        workerScript,
-        { eval: true }
-      );
-      global.pdfjsWorker = { worker };
-    }
+    const pdfParser = new PDFParser(null, true);
 
-    const pdfExtract = new PDFExtract()
-    const options: PDFExtractOptions = {}
+    pdfParser.loadPDF(file.filepath);
 
-    const data = await pdfExtract.extract(file.filepath, options)
-    
-    // Extract text from all pages
-    const text = data.pages.map(page => page.content.map(item => item.str).join(' ')).join('\n')
+    const text = await new Promise<string>((resolve, reject) => {
+      pdfParser.on("pdfParser_dataReady", (pdfData: any) => {
+        const text = pdfParser.getRawTextContent();
+        resolve(text);
+      });
+
+      pdfParser.on("pdfParser_dataError", (errData: { parserError: Error }) => {
+        reject(errData.parserError);
+      });
+    });
 
     res.status(200).json({ text })
   } catch (err) {
