@@ -11,13 +11,19 @@ export const config = {
 
 // In-memory worker setup
 const workerScript = `
-  self.onmessage = function (event) {
-    const { action, data } = event.data;
+  const { parentPort } = require('worker_threads');
+  parentPort.on('message', (event) => {
+    const { action, data } = event;
     if (action === 'getDocument') {
-      postMessage({ action: 'workerLoaded' });
+      parentPort.postMessage({ action: 'workerLoaded' });
     }
-  };
+  });
 `;
+
+// Extend the global interface to include our custom property
+declare global {
+  var pdfjsWorker: { worker: any } | undefined;
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -38,10 +44,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (typeof window === 'undefined' && !global.pdfjsWorker) {
       const { Worker } = require('worker_threads');
       const worker = new Worker(
-        `
-        const { parentPort } = require('worker_threads');
-        ${workerScript}
-        `,
+        workerScript,
         { eval: true }
       );
       global.pdfjsWorker = { worker };
