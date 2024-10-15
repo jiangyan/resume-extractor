@@ -3,7 +3,6 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const nextConfig = {
   // Remove the i18n config if it's there, as we're handling it differently now
 }
-
 module.exports = {
   webpack: (config, { isServer }) => {
     if (isServer) {

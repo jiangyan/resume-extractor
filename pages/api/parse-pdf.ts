@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import formidable from 'formidable'
 import fs from 'fs'
-import { PDFExtract } from 'pdf.js-extract'
+import { PDFExtract, PDFExtractOptions } from 'pdf.js-extract'
 import path from 'path'
 
 export const config = {
@@ -36,10 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const pdfExtract = new PDFExtract()
-    const options = {
-      disableFontFace: true, // This can help with font-related issues
-      useSystemFonts: false, // This can also help with font-related issues
-    }
+    const options: PDFExtractOptions = {}
 
     // Set up the custom worker
     if (typeof window === 'undefined') {
@@ -59,6 +56,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(200).json({ text })
   } catch (err) {
     console.error(err)
-    return res.status(500).json({ error: 'Error processing PDF', details: err.message })
+    return res.status(500).json({ error: 'Error processing PDF', details: err instanceof Error ? err.message : String(err) })
   }
 }
