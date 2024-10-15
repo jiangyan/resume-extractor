@@ -2,7 +2,6 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import formidable from 'formidable'
 import fs from 'fs'
 import { PDFExtract, PDFExtractOptions } from 'pdf.js-extract'
-import path from 'path'
 
 export const config = {
   api: {
@@ -10,8 +9,8 @@ export const config = {
   },
 }
 
-// Custom worker setup
-const customWorker = `
+// In-memory worker setup
+const workerScript = `
   self.onmessage = function (event) {
     const { action, data } = event.data;
     if (action === 'getDocument') {
@@ -35,18 +34,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'No file uploaded' })
     }
 
+    // Set up in-memory worker
+    if (typeof window === 'undefined' && !global.pdfjsWorker) {
+      const { Worker } = require('worker_threads');
+      const worker = new Worker(
+        `
+        const { parentPort } = require('worker_threads');
+        ${workerScript}
+        `,
+        { eval: true }
+      );
+      global.pdfjsWorker = { worker };
+    }
+
     const pdfExtract = new PDFExtract()
     const options: PDFExtractOptions = {}
-
-    // Set up the custom worker
-    if (typeof window === 'undefined') {
-      const workerSrc = path.join(process.cwd(), 'pdf.worker.js')
-      if (!fs.existsSync(workerSrc)) {
-        fs.writeFileSync(workerSrc, customWorker)
-      }
-      // @ts-ignore
-      global.pdfjsWorker = { workerSrc }
-    }
 
     const data = await pdfExtract.extract(file.filepath, options)
     
