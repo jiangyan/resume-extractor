@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import formidable from 'formidable'
 import fs from 'fs'
-import pdfParse from 'pdf-parse'
+import { PDFExtract } from 'pdf.js-extract'
 
 export const config = {
   api: {
@@ -19,14 +19,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const [fields, files] = await form.parse(req)
     const file = Array.isArray(files.file) ? files.file[0] : files.file
+    
     if (!file) {
       return res.status(400).json({ error: 'No file uploaded' })
     }
 
-    const buffer = fs.readFileSync(file.filepath)
-    const data = await pdfParse(buffer)
-    res.status(200).json({ text: data.text })
+    const pdfExtract = new PDFExtract()
+    const options = {} // You can add options here if needed
+
+    const data = await pdfExtract.extract(file.filepath, options)
+    
+    // Extract text from all pages
+    const text = data.pages.map(page => page.content.map(item => item.str).join(' ')).join('\n')
+
+    res.status(200).json({ text })
   } catch (err) {
-    return res.status(500).json({ error: 'Error parsing form data' })
+    console.error(err)
+    return res.status(500).json({ error: 'Error processing PDF' })
   }
 }
