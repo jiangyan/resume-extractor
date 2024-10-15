@@ -2,12 +2,23 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import formidable from 'formidable'
 import fs from 'fs'
 import { PDFExtract } from 'pdf.js-extract'
+import path from 'path'
 
 export const config = {
   api: {
     bodyParser: false,
   },
 }
+
+// Custom worker setup
+const customWorker = `
+  self.onmessage = function (event) {
+    const { action, data } = event.data;
+    if (action === 'getDocument') {
+      postMessage({ action: 'workerLoaded' });
+    }
+  };
+`;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -25,7 +36,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const pdfExtract = new PDFExtract()
-    const options = {} // You can add options here if needed
+    const options = {
+      disableFontFace: true, // This can help with font-related issues
+      useSystemFonts: false, // This can also help with font-related issues
+    }
+
+    // Set up the custom worker
+    if (typeof window === 'undefined') {
+      const workerSrc = path.join(process.cwd(), 'pdf.worker.js')
+      if (!fs.existsSync(workerSrc)) {
+        fs.writeFileSync(workerSrc, customWorker)
+      }
+      // @ts-ignore
+      global.pdfjsWorker = { workerSrc }
+    }
 
     const data = await pdfExtract.extract(file.filepath, options)
     
@@ -35,6 +59,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(200).json({ text })
   } catch (err) {
     console.error(err)
-    return res.status(500).json({ error: 'Error processing PDF' })
+    return res.status(500).json({ error: 'Error processing PDF', details: err.message })
   }
 }
