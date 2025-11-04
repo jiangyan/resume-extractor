@@ -18,23 +18,24 @@ export async function generateStaticParams() {
   return i18n.locales.map((locale) => ({ lang: locale }))
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
   params,
 }: {
   children: React.ReactNode
-  params: { lang: string }
+  params: Promise<{ lang: string }>
 }) {
+  const { lang } = await params
   return (
-    <html lang={params.lang} suppressHydrationWarning>
+    <html lang={lang} suppressHydrationWarning>
       <body className={`${inter.className} dark:bg-gray-900 dark:text-gray-100`}>
         <ClientProviders>
           <div className="flex flex-col min-h-screen">
-            <Header lang={params.lang} />
+            <Header lang={lang} />
             <main className="flex-grow">
               {children}
             </main>
-            <Footer lang={params.lang} />
+            <Footer lang={lang} />
           </div>
           <Analytics />
         </ClientProviders>

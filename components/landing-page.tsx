@@ -77,7 +77,7 @@ export function LandingPage({ lang }: { lang: string }) {
     }
   }
 
-  const t = translations[lang as keyof typeof translations]
+  const t = translations[lang as keyof typeof translations] || translations.en
 
   return (
     <div className="flex flex-col min-h-screen">

@@ -54,10 +54,11 @@ interface CandidateInfo {
   graduateSchools: { name: string; duration: string; }[];
 }
 
-export default function ResumeAnalyzer({ params: { lang } }: { params: { lang: string } }) {
+export default function ResumeAnalyzer({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = React.use(params)
   const { data: session, status } = useSession()
   const router = useRouter()
-  const t = translations[lang as keyof typeof translations]
+  const t = translations[lang as keyof typeof translations] || translations.en
 
   const [files, setFiles] = useState<File[]>([])
   const [results, setResults] = useState<CandidateInfo[]>([])

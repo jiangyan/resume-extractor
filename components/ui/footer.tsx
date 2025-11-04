@@ -14,7 +14,7 @@ export function Footer({ lang }: { lang: string }) {
     }
   }
 
-  const t = translations[lang as keyof typeof translations]
+  const t = translations[lang as keyof typeof translations] || translations.en
 
   return (
     <footer className="w-full py-6 border-t mt-auto">

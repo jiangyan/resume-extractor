@@ -25,7 +25,7 @@
     "lucide-react": "^0.438.0",
     "my-app": "file:",
     "negotiator": "^0.6.3",
-    "next": "^14.2.9",
+    "next": "^16.0.2-canary.6",
     "next-auth": "^4.22.1",
     "next-themes": "^0.3.0",
     "openai": "^4.57.3",
