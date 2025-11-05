@@ -1,99 +1,254 @@
 # Resume Extractor
 
-Resume Extractor is an AI-powered tool that helps users extract key information from resume PDFs. It leverages multiple AI models, including OpenAI's GPT and Google's Gemini, to automatically identify and extract essential details with high accuracy.
+An AI-powered resume analysis tool that extracts and structures key information from PDF resumes. Built with Next.js and powered by multiple AI models including OpenAI GPT, Google Gemini, Anthropic Claude, and DeepSeek.
 
-## Features
+## 🌟 Features
 
-- AI-powered extraction of key information from resume PDFs
-- Support for multiple AI models:
-  - OpenAI: gpt-4o-mini-2024-07-18
-  - OpenAI: gpt-4o-2024-08-06
-  - Google: gemini-1.5-flash
-  - Google: gemini-1.5-pro
-  - Claude: claude-3-haiku-20240307
-  - Claude: claude-3-5-sonnet-20240620
+- **Multi-Provider AI Analysis**: Choose from multiple AI models for resume extraction
+  - OpenAI: gpt-4o-mini-2024-07-18, gpt-4o-2024-08-06
+  - Google: gemini-1.5-flash-exp-0827, gemini-1.5-pro-exp-0827
+  - Anthropic Claude: claude-3-haiku-20240307, claude-3-5-sonnet-20240620
   - DeepSeek: deepseek-chat
-- Identifies and extracts:
-  - Name
-  - Self-assessment
-  - Company experience
+
+- **Smart Information Extraction**: Automatically identifies and extracts:
+  - Personal information (Name, contact details)
+  - Professional self-assessment
+  - Work experience and company history
   - Educational background
-- Converts unstructured resume data into structured, easily analyzable format
-- Modern, responsive UI designed with v0.dev
+  - Skills and certifications
 
-## Key Technology
+- **PDF Processing**: Robust PDF parsing using pdf2json to handle various resume formats
 
-- **Multi-Model AI-Driven Extraction**: Employs advanced AI models from OpenAI, Google, Anthropic (Claude), and DeepSeek to understand and parse complex resume formats
-- **OpenAI GPT Models**: Utilizes the latest GPT models for precise information extraction
-- **Google Gemini Models**: Leverages Gemini's capabilities for structured output and efficient processing
-- **Claude Models**: Incorporates Anthropic's Claude for advanced natural language understanding
-- **DeepSeek Models**: Utilizes DeepSeek's AI capabilities for enhanced resume parsing
-- **PDF Processing**: Handles various PDF formats and layouts
-- **v0.dev**: Used for designing the entire UI, generating shadcn-compatible components
-- **shadcn UI**: Utilized for rapid development of a sleek, modern interface
-- **Cursor AI**: Employed to complete additional features and enhance functionality
+- **Internationalization**: Built-in support for multiple languages (English and Chinese)
 
-## Getting Started
-First, run the development server:
+- **Modern UI**: Responsive interface built with:
+  - shadcn/ui components
+  - Tailwind CSS
+  - Dark mode support
+  - Framer Motion animations
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Batch Processing**: Upload and analyze multiple resumes simultaneously
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **Export Capability**: Export analysis results to structured formats (XLSX support)
 
-### Prerequisites
+## 🛠️ Tech Stack
 
-- Node.js
-- Next.js
-- OpenAI API access
+- **Framework**: Next.js 16 (App Router + Pages Router hybrid)
+- **Language**: TypeScript
+- **UI Library**: React 18
+- **Styling**: Tailwind CSS
+- **Components**: shadcn/ui, Radix UI
+- **Authentication**: NextAuth.js with Google OAuth
+- **AI SDKs**:
+  - OpenAI SDK
+  - Google Generative AI SDK
+  - Anthropic SDK
+  - Axios (for DeepSeek API)
+- **PDF Processing**: pdf2json
+- **Analytics**: Vercel Analytics
+- **Data Export**: xlsx
+- **Form Handling**: Formidable
+- **Validation**: Zod
 
-### Installation
+## 📋 Prerequisites
 
-1. Clone the repository:
-   ```
+- Node.js 18+ or later
+- npm, yarn, pnpm, or bun package manager
+- API keys for at least one AI provider:
+  - OpenAI API key (from [OpenAI Platform](https://platform.openai.com))
+  - Google AI API key (from [Google AI Studio](https://makersuite.google.com/app/apikey))
+  - Anthropic API key (from [Anthropic Console](https://console.anthropic.com))
+  - DeepSeek API key (from [DeepSeek Platform](https://platform.deepseek.com))
+- Google OAuth credentials (for authentication)
+
+## 🚀 Installation
+
+1. **Clone the repository**
+   ```bash
    git clone https://github.com/jiangyan/resume-extractor.git
-   ```
-2. Navigate to the project directory:
-   ```
    cd resume-extractor
    ```
-3. Install dependencies:
-   ```
+
+2. **Install dependencies**
+   ```bash
    npm install
+   # or
+   yarn install
+   # or
+   pnpm install
+   # or
+   bun install
    ```
-4. Set up your OpenAI API credentials (add instructions on how to do this securely)
 
-## Usage
+3. **Set up environment variables**
 
-It's pretty straight forward, UI is in Chinese though
+   Create a `.env.local` file in the root directory:
+   ```bash
+   cp .env.example .env.local
+   ```
 
-## Deploy on Vercel
+   Edit `.env.local` and add your API keys:
+   ```env
+   # AI Provider API Keys (add at least one)
+   OPENAI_API_KEY=your_openai_api_key_here
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ANTHROPIC_API_KEY=your_anthropic_api_key_here
+   DEEPSEEK_API_KEY=your_deepseek_api_key_here
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   # Google OAuth (for authentication)
+   GOOGLE_CLIENT_ID=your_google_client_id_here
+   GOOGLE_CLIENT_SECRET=your_google_client_secret_here
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+   # NextAuth Configuration
+   NEXTAUTH_URL=http://localhost:3000
+   NEXTAUTH_SECRET=your_nextauth_secret_here
+   ```
 
-## Contributing
+   **To generate NEXTAUTH_SECRET:**
+   ```bash
+   openssl rand -base64 32
+   ```
+
+4. **Run the development server**
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   # or
+   pnpm dev
+   # or
+   bun dev
+   ```
+
+5. **Open your browser**
+
+   Navigate to [http://localhost:3000](http://localhost:3000) to see the application.
+
+## 📖 Usage
+
+1. **Upload Resumes**: Drag and drop or select PDF resume files
+2. **Select AI Model**: Choose your preferred AI model from the dropdown
+3. **Analyze**: Click the analyze button to extract information
+4. **Review Results**: View structured data extracted from each resume
+5. **Export**: Download results in XLSX format for further processing
+
+Note: The UI is primarily in Chinese, but supports internationalization for English as well.
+
+## 🏗️ Project Structure
+
+```
+resume-extractor/
+├── app/                          # Next.js App Router
+│   ├── [lang]/                   # Internationalized routes
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   └── resume-analyzer/
+│   ├── providers.tsx
+│   └── client-providers.tsx
+├── pages/                        # Next.js Pages Router
+│   ├── api/
+│   │   ├── analyze-resumes.ts    # Resume analysis endpoint
+│   │   ├── parse-pdf.ts          # PDF parsing endpoint
+│   │   └── auth/
+│   └── _app.js
+├── components/                   # React components
+│   ├── landing-page.tsx
+│   ├── loading-text-animation.tsx
+│   └── ui/                       # shadcn/ui components
+├── utils/                        # Utility functions
+│   ├── analyzeResumes.ts         # Main analysis logic
+│   └── aiProviders/              # AI provider integrations
+│       ├── openAIProvider.ts
+│       ├── googleAIProvider.ts
+│       ├── anthropicProvider.ts
+│       ├── deepseekProvider.ts
+│       └── models.ts
+├── lib/                          # Library code
+├── i18n-config.ts                # i18n configuration
+├── middleware.ts                 # Next.js middleware
+└── public/                       # Static assets
+```
+
+## 🌐 API Endpoints
+
+### POST `/api/parse-pdf`
+Parses PDF files and extracts text content.
+
+**Request**: Multipart form data with PDF file
+**Response**: `{ text: string }`
+
+### POST `/api/analyze-resumes`
+Analyzes resume text using selected AI model.
+
+**Request**:
+```json
+{
+  "fileContents": ["resume text 1", "resume text 2"],
+  "model": "openai:gpt-4o-mini-2024-07-18"
+}
+```
+
+**Response**: Array of structured resume data
+
+## 🚀 Deployment
+
+### Deploy to Vercel
+
+The easiest way to deploy this Next.js application is using the [Vercel Platform](https://vercel.com/new).
+
+1. Push your code to a Git repository (GitHub, GitLab, or Bitbucket)
+2. Import your repository to Vercel
+3. Add environment variables in the Vercel dashboard
+4. Deploy!
+
+For more details, check the [Next.js deployment documentation](https://nextjs.org/docs/deployment).
+
+### Environment Variables for Production
+
+Make sure to add all required environment variables in your Vercel project settings:
+- AI provider API keys
+- Google OAuth credentials
+- NextAuth configuration
+
+## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## License
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-It's 99% AI generated codes, I only input English, then tab, tab, tab, ta-da, use whatever you want
+## 📝 License
 
-## Acknowledgments
+This project is 99% AI-generated code. Feel free to use it however you want!
 
-- OpenAI for providing the GPT models and Structured Output capabilities
-- Google for the Gemini AI models
-- Anthropic for the Claude AI models
-- DeepSeek for their AI capabilities
-- [v0.dev](https://v0.dev/) for UI design and component generation
-- [shadcn UI](https://ui.shadcn.com/) for the component library
-- Cursor AI for assisting with feature completion
+## 🙏 Acknowledgments
+
+- **AI Providers**:
+  - [OpenAI](https://openai.com) for GPT models and Structured Output capabilities
+  - [Google](https://ai.google.dev) for Gemini AI models
+  - [Anthropic](https://anthropic.com) for Claude AI models
+  - [DeepSeek](https://deepseek.com) for their AI capabilities
+
+- **Tools & Frameworks**:
+  - [Next.js](https://nextjs.org) for the React framework
+  - [Vercel](https://vercel.com) for hosting and analytics
+  - [v0.dev](https://v0.dev/) for UI design and component generation
+  - [shadcn/ui](https://ui.shadcn.com/) for the beautiful component library
+  - [Cursor AI](https://cursor.sh/) for AI-assisted development
+
+- **Libraries**:
+  - [pdf2json](https://github.com/modesty/pdf2json) for PDF parsing
+  - [NextAuth.js](https://next-auth.js.org/) for authentication
+  - [Tailwind CSS](https://tailwindcss.com/) for styling
+  - [Radix UI](https://www.radix-ui.com/) for accessible components
+
+## 📞 Support
+
+For questions or issues, please open an issue on the [GitHub repository](https://github.com/jiangyan/resume-extractor/issues).
+
+---
+
+Built with ❤️ using AI-powered development tools
